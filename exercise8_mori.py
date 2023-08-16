@@ -1,4 +1,6 @@
 import cv2 as cv
+import numpy as np
+import matplotlib.pyplot as plt
 
 
 def detect_edge(img_path):
@@ -18,19 +20,28 @@ def detect_edge(img_path):
     # cv.destroyAllWindows()
 
 
-def find_contour(edge_detected):
-    contours, hierarchy = cv.findContours(edge_detected, cv.RETR_EXTERNAL, cv.CHAIN_APPROX_SIMPLE)
+# def find_contour(edge_detected):
+#     contours, hierarchy = cv.findContours(edge_detected, cv.RETR_EXTERNAL, cv.CHAIN_APPROX_SIMPLE)
 
-    return contours
+#     return contours
 
-    # contour_img = cv.cvtColor(edge_detected, cv.COLOR_GRAY2BGR)
-    # cv.drawContours(contour_img, contours, -1, (0, 255, 0), 1)
+#     # contour_img = cv.cvtColor(edge_detected, cv.COLOR_GRAY2BGR)
+#     # cv.drawContours(contour_img, contours, -1, (0, 255, 0), 1)
 
-    # cv.imshow('found contours', contour_img)
+#     # cv.imshow('found contours', contour_img)
 
-    # cv.waitKey(0)
-    # cv.destroyAllWindows()
+#     # cv.waitKey(0)
+#     # cv.destroyAllWindows()
 
+
+def calc_edge_density(edge_detected):
+    edge_pixel_count = np.count_nonzero(edge_detected == 255)
+    
+    total_pixels = edge_detected.size
+    
+    edge_density = edge_pixel_count / total_pixels
+
+    return edge_density
 
 
 def main():
@@ -38,7 +49,10 @@ def main():
 
     edge_detected = detect_edge(img_path)
 
-    found_contour = find_contour(edge_detected)
+    # found_contour = find_contour(edge_detected)
+
+    edge_density = calc_edge_density(edge_detected)
+
 
 
 if __name__ == "__main__":
