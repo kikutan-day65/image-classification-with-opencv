@@ -52,9 +52,6 @@ def edge_orientation_histogram(edge_detected):
     num_bins = 16  # ヒストグラムのビン数（角度の範囲を均等に分割）
     hist, bins = np.histogram(edge_direction, bins=num_bins, range=(-np.pi, np.pi))
 
-    print(hist)
-    print(bins)
-
     return hist, bins
 
     # エッジ方向ヒストグラムを表示
@@ -63,6 +60,26 @@ def edge_orientation_histogram(edge_detected):
     # plt.ylabel('Frequency')
     # plt.title('Edge Direction Histogram')
     # plt.savefig('edge-orientation-hist.png')
+
+def extract_contour_features(contour):
+    contour_features = []
+
+    contour_features.append(len(contour))
+
+    return contour_features
+
+
+def generate_feature_vector(edge_density, contour_and_hierarchy, hist_and_bins):
+    feature_vector = []
+
+    for contour in contour_and_hierarchy:
+        contour_features = extract_contour_features(contour)
+        feature_vector.extend(contour_features)
+
+    feature_vector.extend(hist_and_bins[0])
+
+    return feature_vector
+
 
 def main():
     img_path = 'test/test-128.jpg'
@@ -73,7 +90,11 @@ def main():
 
     contour_and_hierarchy = find_contour(edge_detected)
 
-    edge_orientation_histogram(edge_detected)
+    hist_and_bins = edge_orientation_histogram(edge_detected)
+
+    feature_vector = generate_feature_vector(edge_density, contour_and_hierarchy, hist_and_bins)
+
+    print("Generated feature vector", feature_vector)
 
 
 if __name__ == "__main__":
