@@ -30,9 +30,9 @@ def calc_edge_density(edge_detected):
 
 
 def find_contour(edge_detected):
-    contours, hierarchy = cv.findContours(edge_detected, cv.RETR_EXTERNAL, cv.CHAIN_APPROX_SIMPLE)
+    contours, hierarchies = cv.findContours(edge_detected, cv.RETR_LIST, cv.CHAIN_APPROX_SIMPLE)
 
-    return contours, hierarchy
+    return contours, hierarchies
 
     # contour_img = cv.cvtColor(edge_detected, cv.COLOR_GRAY2BGR)
     # cv.drawContours(contour_img, contours, -1, (0, 255, 0), 1)
