@@ -1,5 +1,6 @@
 import cv2 as cv
 import numpy as np
+# import matplotlib.pyplot as plt
 
 def detect_edge(img_path):
     img = cv.imread(img_path, cv.IMREAD_GRAYSCALE)
@@ -42,6 +43,27 @@ def find_contour(edge_detected):
     # cv.destroyAllWindows()
 
 
+def edge_orientation_histogram(edge_detected):
+    gradient_x = cv.Sobel(edge_detected, cv.CV_64F, 1, 0, ksize=3)
+    gradient_y = cv.Sobel(edge_detected, cv.CV_64F, 0, 1, ksize=3)
+
+    edge_direction = np.arctan2(gradient_y, gradient_x)
+
+    num_bins = 16  # ヒストグラムのビン数（角度の範囲を均等に分割）
+    hist, bins = np.histogram(edge_direction, bins=num_bins, range=(-np.pi, np.pi))
+
+    print(hist)
+    print(bins)
+
+    return hist, bins
+
+    # エッジ方向ヒストグラムを表示
+    # plt.bar(bins[:-1], hist, width=np.pi/4)
+    # plt.xlabel('Edge Direction')
+    # plt.ylabel('Frequency')
+    # plt.title('Edge Direction Histogram')
+    # plt.savefig('edge-orientation-hist.png')
+
 def main():
     img_path = 'test/test-128.jpg'
 
@@ -50,6 +72,8 @@ def main():
     edge_density = calc_edge_density(edge_detected)
 
     contour_and_hierarchy = find_contour(edge_detected)
+
+    edge_orientation_histogram(edge_detected)
 
 
 if __name__ == "__main__":
