@@ -162,3 +162,5 @@ cython_debug/
 
 pdfs_image_classification_task/
 data_collection_img/
+test/
+result/
