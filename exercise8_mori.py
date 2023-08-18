@@ -9,11 +9,11 @@ def detect_edge(img_path):
 
     blur = cv.GaussianBlur(resized_img, (3, 3), 3)
 
-    detected_edge = cv.Canny(blur, threshold1=200, threshold2=250, L2gradient=True)
+    detected_edge = cv.Canny(blur, threshold1=125, threshold2=175, L2gradient=True)
 
     return detected_edge
 
-    # cv.imshow('Detected edge', edetected_edge)
+    # cv.imshow('Detected edge', detected_edge)
 
     # cv.waitKey(0)
     # cv.destroyAllWindows()
