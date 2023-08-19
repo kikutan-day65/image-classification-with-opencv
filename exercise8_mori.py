@@ -1,6 +1,7 @@
 import cv2 as cv
 import numpy as np
 import os
+import matplotlib.pyplot as plt
 
 # def detect_edge(img_path):
 #     img = cv.imread(img_path, cv.IMREAD_GRAYSCALE)
@@ -59,16 +60,36 @@ def harris_corner_detection(img_path):
     # Threshold for an optimal value, it may vary depending on the image.
     img[dst > 0.01 * dst.max()] = [0, 255, 0]
 
-    cv.imshow('dst', dst)
+    # cv.imshow('dst', dst)
 
     cv.waitKey(0)
     cv.destroyAllWindows()
 
 
+def tomasi_corner_detection(img_path):
+    img = cv.imread(img_path)
+
+    # remove image noises
+    blur = cv.GaussianBlur(img, (3, 3), 0)
+
+    gray = cv.cvtColor(blur, cv.COLOR_BGR2GRAY)
+
+    corners = cv.goodFeaturesToTrack(gray, 100, 0.01, 10)
+    corners = np.int0(corners)
+
+    for i in corners:
+        x, y = i.ravel()
+        cv.circle(img, (x, y), 3, 255, -1)
+    
+    cv.imwrite('./test.jpg', img)
+
+
 def main():
-    img_path = 'test/test-170.jpg'
+    img_path = 'test/test-128.jpg'
 
     harris_corner_detection(img_path)
+
+    tomasi_corner_detection(img_path)
 
 
     # dir = 'test'
