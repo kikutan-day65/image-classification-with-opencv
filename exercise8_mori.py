@@ -7,7 +7,14 @@ from sklearn.cluster import KMeans
 
 
 def main():
-    
+    img_path = []
+
+    dir = 'test'
+    for filename in os.listdir(dir):
+        path = os.path.join(dir, filename)
+        img_path.append(path)
+
+
 
 if __name__ == "__main__":
     main()
