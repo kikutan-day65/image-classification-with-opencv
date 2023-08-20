@@ -13,6 +13,12 @@ def detect_edges(img_path):
     return edge_detection
 
 
+def find_contours(edge_detected):
+    contours, hierarchies = cv.findContours(edge_detected, cv.RETR_LIST, cv.CHAIN_APPROX_SIMPLE)
+
+    return contours
+
+
 def main():
     # img_paths = []
 
@@ -25,6 +31,8 @@ def main():
     img_path = 'data_collection_img/image.jpg'
     
     edges_detected = detect_edges(img_path)
+
+    contours_found = find_contours(edges_detected)
 
 
 if __name__ == "__main__":
