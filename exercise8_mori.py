@@ -69,6 +69,27 @@ def hough_lines(img_path):
     cv.destroyAllWindows()
 
 
+def find_contours(img_path):
+    img = cv.imread(img_path)
+    img = cv.resize(img, (500, 800))
+    img = cv.GaussianBlur(img, (5, 5), 5)
+
+    gray = cv.cvtColor(img, cv.COLOR_BGR2GRAY)
+
+    edges = cv.Canny(gray, 50, 150, apertureSize=3)
+
+    contours, hierarchy = cv.findContours(edges, cv.RETR_EXTERNAL, cv.CHAIN_APPROX_SIMPLE)
+
+    cv.drawContours(img, contours, -1, (255,0,0), 1)
+
+    cv.imshow('contours', img)
+
+    print(len(contours))
+
+    cv.waitKey(0)
+    cv.destroyAllWindows()
+
+
 def classify_image_and_others(img_path, filename, saturation):
     img = cv.imread(img_path)
 
