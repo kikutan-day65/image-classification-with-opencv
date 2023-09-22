@@ -27,9 +27,11 @@ def harris_corners(img_path):
 
     img[dst > 0.01 * dst.max()] = [0, 0, 255]
 
-    cv.imshow('dst', img)
+    # cv.imshow('dst', img)
     if cv.waitKey(0) & 0xff == 27:
         cv.destroyAllWindows()
+
+    return len(dst)
 
 
 def hough_lines(img_path):
@@ -61,12 +63,12 @@ def hough_lines(img_path):
 
         cv.line(img, (x1, y1), (x2, y2), (0, 0, 255), 2)
 
-    cv.imshow('houghlines', img)
-
-    print(len(lines))
+    # cv.imshow('houghlines', img)
 
     cv.waitKey(0)
     cv.destroyAllWindows()
+
+    return len(lines)
 
 
 def find_contours(img_path):
@@ -82,12 +84,12 @@ def find_contours(img_path):
 
     cv.drawContours(img, contours, -1, (255,0,0), 1)
 
-    cv.imshow('contours', img)
-
-    print(len(contours))
+    # cv.imshow('contours', img)
 
     cv.waitKey(0)
     cv.destroyAllWindows()
+
+    return len(contours)
 
 
 def classify_image_and_others(img_path, filename, saturation):
@@ -125,28 +127,42 @@ def thresholding(img_path):
     return percentage
 
 
-    # dir = 'result/text_and_diagram'
+def main():
+
+    img_path = 'test/test-268.jpg'
+
+    # thresholding(img_path)
+
+
+    # corners = harris_corners(img_path)
+    # print("corners: ", corners)
+
+    # lines = hough_lines(img_path)
+    # print("lines: ", lines)
+
+    # cont = find_contours(img_path)
+    # print("contours: ", cont)
+
+    # percentage = thresholding(img_path)
+    # print(f'black pix: {percentage} %')
+
+    # dir = 'test'
     # for filename in os.listdir(dir):
     #     img_path = os.path.join(dir, filename)
 
-    #     # 画像を読み込む
-    #     image = cv.imread(img_path, cv.IMREAD_GRAYSCALE)
+    #     saturation = calc_average_saturation(img_path)
+    #     contours = find_contours(img_path)
+    #     percentage = thresholding(img_path)
 
-    #     # 画像の前処理（二値化、輪郭抽出）
-    #     _, binary_image = cv.threshold(image, 127, 255, cv.THRESH_BINARY)
-    #     contours, _ = cv.findContours(binary_image, cv.RETR_LIST, cv.CHAIN_APPROX_SIMPLE)
+    #     classify_images(img_path, filename, saturation, contours, percentage)
 
-    #     # テキストと図表の分類
-    #     text_contour_threshold = 500  # テキストと判断するための輪郭の数の閾値（適宜調整）
+        # percentage = thresholding(img_path)
+        # classify(img_path, filename, percentage)
 
-    #     print(len(contours))
+        # average_saturation = calc_average_saturation(img_path)
+        # classify_image_and_others(img_path, filename, average_saturation)
 
-    #     # 輪郭の数でテキストと図表を分類
-    #     if len(contours) > text_contour_threshold:
-    #         cv.imwrite('result/text/' + filename, image)
-    #     else:
-    #         cv.imwrite('result/diagram/' + filename, image)
-
+        
 
 if __name__ == "__main__":
     main()
