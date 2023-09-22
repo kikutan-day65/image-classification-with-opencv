@@ -99,24 +99,30 @@ def classify_image_and_others(img_path, filename, saturation):
         cv.imwrite('result/text_and_diagram/' + filename, img)
 
 
+def thresholding(img_path):
+    img = cv.imread(img_path, cv.IMREAD_GRAYSCALE)
+    img = cv.resize(img, (500, 800))
 
-def main():
+    threshold, thresh = cv.threshold(img, 200, 255, cv.THRESH_BINARY)
 
-    img_path = 'test/test-024.jpg'
+    # ピクセル数を取得
+    width, height = thresh.shape
+    total_pixels = width * height
 
-    # corners = harris_corners(img_path)
-    lines = hough_lines(img_path)
+    black_pixels = np.sum(thresh == 0)
 
-    # cont = find_contours(img_path)
+    # print("total_pixels:", total_pixels)
+    # print('Number of black pixels:', black_pixels)
 
-    # dir = 'test'
-    # for filename in os.listdir(dir):
-    #     img_path = os.path.join(dir, filename)
+    # 黒ピクセルの割合
+    percentage = (black_pixels / total_pixels) * 100
 
-    #     average_saturation = calc_average_saturation(img_path)
+    # cv.imshow('bin', thresh)
 
-    #     classify_image_and_others(img_path, filename, average_saturation)
+    cv.waitKey(0)
+    cv.destroyAllWindows()
 
+    return percentage
 
 
     # dir = 'result/text_and_diagram'
