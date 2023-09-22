@@ -1,6 +1,7 @@
 import cv2 as cv
 import numpy as np
 import os
+import matplotlib.pyplot as plt
 
 
 def calc_average_saturation(img_path):
@@ -15,23 +16,65 @@ def calc_average_saturation(img_path):
     return average_saturation
 
 
-def harris_corners(img_path):
+def harris_corners(img_path, window_size, k, threshold):
     img = cv.imread(img_path)
-    img = cv.GaussianBlur(img, (3, 3), 3)
     gray = cv.cvtColor(img, cv.COLOR_BGR2GRAY)
 
-    gray = np.float32(gray)
-    dst = cv.cornerHarris(gray, 2, 3, 0.04)
+    img_gaussian = cv.GaussianBlur(gray, (3, 3), 0)
 
-    dst = cv.dilate(dst, None)
+    height = img.shape[0]
+    width = img.shape[1]
 
-    img[dst > 0.01 * dst.max()] = [0, 0, 255]
+    matrix_R = np.zeros((height, width))
 
-    # cv.imshow('dst', img)
-    if cv.waitKey(0) & 0xff == 27:
-        cv.destroyAllWindows()
+    # Calculate the x e y image derivatives
+    dx = cv.Sobel(img_gaussian, cv.CV_64F, 1, 0, ksize=3)
+    dy = cv.Sobel(img_gaussian, cv.CV_64F, 0, 1, ksize=3)
 
-    return len(dst)
+    # Calculate product and second derivatives
+    dx2 = np.square(dx)
+    dy2 = np.square(dy)
+    dxy = dx * dy
+
+    offset = int(window_size / 2)
+
+    # Calculate the sum of the products of derivatives for each pixel
+    print ("Finding Corners...")
+    for y in range(offset, height-offset):
+        for x in range(offset, width-offset):
+            Sx2 = np.sum(dx2[y - offset : y + 1 + offset, x - offset : x + 1 + offset])
+            Sy2 = np.sum(dy2[y - offset : y + 1 + offset, x - offset : x + 1 + offset])
+            Sxy = np.sum(dxy[y - offset : y + 1 + offset, x - offset : x + 1 + offset])
+
+            # Define the matrix H(x, y)=[ [Sx2, Sxy], [Sxy, Sy2] ]
+            H = np.array([[Sx2, Sxy], [Sxy, Sy2]])
+
+            # Calculate the response function ( R=det(H)-k(Trace(H))^2 )
+            det = np.linalg.det(H)
+            tr = np.matrix.trace(H)
+            R = det-k*(tr**2)
+            matrix_R[y - offset, x - offset] = R
+
+    # Apply a threshold
+    cv.normalize(matrix_R, matrix_R, 0, 1, cv.NORM_MINMAX)
+
+    corners = 0
+
+    for y in range(offset, height - offset):
+        for x in range(offset, width - offset):
+            value=  matrix_R[y, x]
+            if value > threshold:
+                # cornerList.append([x, y, value])
+                cv.circle(img, (x, y), 3, (0, 0, 255))
+
+                corners += 1
+    
+    print(corners)
+
+    plt.figure("Manually implemented Harris detector")
+    plt.imshow(cv.cvtColor(img, cv.COLOR_BGR2RGB)), plt.title("Manually implemented Harris detector")
+    plt.xticks([]), plt.yticks([])
+    plt.show()
 
 
 def hough_lines(img_path):
@@ -129,12 +172,12 @@ def thresholding(img_path):
 
 def main():
 
-    img_path = 'test/test-268.jpg'
+    img_path = 'test/test-210.jpg'
 
     # thresholding(img_path)
 
 
-    # corners = harris_corners(img_path)
+    corners = harris_corners(img_path, 5, 0.04, 0.30)
     # print("corners: ", corners)
 
     # lines = hough_lines(img_path)
