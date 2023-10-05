@@ -25,6 +25,20 @@ def classify_image_and_others(img_path, filename, saturation):
         cv.imwrite('result/text_and_diagram/' + filename, img)
 
 
+def crop_image(img_path):
+    img = cv.imread(img_path)
+    img = cv.resize(img, (650, 1000))
+
+    crop = img[50:, 30:]
+
+    cv.imshow('cropped', crop)
+
+    cv.waitKey(0)
+    cv.destroyAllWindows()
+
+    return crop
+
+
 def find_contours(img_path):
     img = cv.imread(img_path)
     img = cv.resize(img, (600, 900))
@@ -75,13 +89,15 @@ def hough_line_p(img_path):
 
 def main():
 
-    img_path = 'dia/test-244.jpg'
+    # img_path = 'dia/test-106.jpg'
 
-    # dir = 'dia'
-    # for filename in os.listdir(dir):
-    #     img_path = os.path.join(dir, filename)
+    # crop_image(img_path)
 
-    #     matching(img_path, filename)
+    dir = 'dia'
+    for filename in os.listdir(dir):
+        img_path = os.path.join(dir, filename)
+
+        crop_image(img_path)
 
 if __name__ == "__main__":
     main()
