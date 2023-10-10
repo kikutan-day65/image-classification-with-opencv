@@ -167,6 +167,9 @@ def classify_to_dia(img_path, filename, percentage, saturation, contains, lines,
         if contours > 2600 or 180 < contours < 350:
             cv.imwrite('result/text/' + filename, img)
             return 0
+        elif 1270 < contours < 1391 or 160 < contours < 170:
+            cv.imwrite('result/text/' + filename, img)
+            return 0
         else:
             cv.imwrite('result/diagram/' + filename, img)
             return 0
@@ -184,13 +187,12 @@ def classify_to_dia(img_path, filename, percentage, saturation, contains, lines,
             cv.imwrite('result/text/' + filename, img)
         else:
             cv.imwrite('result/diagram/' + filename, img)
-
-
-        # cv.imwrite('result/diagram/' + filename, img)
+     
 
 def main():
 
-    # img_path = 'test/test-010.jpg'
+    # img_path = 'test2/test2-050.jpg'
+    # print(find_contours(img_path))
 
     # arr = []
 
