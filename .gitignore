@@ -164,8 +164,7 @@ pdfs_image_classification_task/
 data_collection_img/
 test*/
 result/
-text/
 garbage/
-images/
-dia/
-dia-processed/
+text*/
+images*/
+dia*/
