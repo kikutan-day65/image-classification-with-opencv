@@ -24,20 +24,28 @@ def image_saturation(img_path):
     return saturation
 
 
+def classify_by_saturation(saturation):
+    if saturation <= 4:
+        print(False) # NOT image
+    else:
+        print(True) # image
+
+
 def main():
 
-    ## add path to pdf to be extracted
-    # pdf_path = ''
+    # # add path to pdf to be extracted
+    # pdf_path = 'pdfs_image_classification_task/pdfs/3.pdf'
     # extract_pdf(pdf_path)
 
     # arr = []
 
-    dir = 'text'
+    dir = 'image'
     for filename in os.listdir(dir):
         img_path = os.path.join(dir, filename)
 
         sat = image_saturation(img_path)
-        # arr.append(sat)
+        classify_by_saturation(sat)
+
 
     # for i in arr:
     #     print(i)
