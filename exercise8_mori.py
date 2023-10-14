@@ -11,7 +11,7 @@ def extract_pdf(pdf_path):
         print('you might add wrong path')
 
     for i in range(len(pdf)):
-        pdf[i].save('page_' + str(i + 1) + '.jpg', 'JPEG')
+        pdf[i].save('test/page_' + str(i + 1) + '.jpg', 'JPEG')
     print('Extracted successfully!')
 
 
