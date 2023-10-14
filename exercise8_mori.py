@@ -43,29 +43,36 @@ def contain_color(img_path):
         return False # NOT diagram
 
 
-def classify_by_saturation(saturation):
-    if saturation <= 4:
-        print(False) # NOT image
-    else:
-        print(True) # image
+def classify(img_path, filename, saturation, contains):
+    img = cv.imread(img_path)
+
+    if saturation > 2:
+        cv.imwrite(f'result/image/{filename}', img)
+        return 0
+    
+    if contains is True:
+        cv.imwrite(f'result/diagram/{filename}', img)
+        return 0
+    
+    cv.imwrite(f'result/text/{filename}', img)
 
 
 def main():
 
-    # # add path to pdf to be extracted
-    # pdf_path = 'pdfs_image_classification_task/pdfs/3.pdf'
+    # add path to pdf to be extracted
+    # pdf_path = 'pdfs_image_classification_task/pdfs/20.pdf'
     # extract_pdf(pdf_path)
 
     # arr = []
 
-    dir = 'dia'
+    dir = 'test'
     for filename in os.listdir(dir):
         img_path = os.path.join(dir, filename)
 
-        # sat = image_saturation(img_path)
-        # classify_by_saturation(sat)
-
+        sat = image_saturation(img_path)
         contains = contain_color(img_path)
+
+        classify(img_path, filename, sat, contains)
 
     # for i in arr:
     #     print(i)
