@@ -15,11 +15,32 @@ def extract_pdf(pdf_path):
     print('Extracted successfully!')
 
 
+def image_saturation(img_path):
+    img = cv.imread(img_path)
+    hsv = cv.cvtColor(img, cv.COLOR_BGR2HSV)
+
+    saturation = hsv[:, :, 1].mean()
+
+    return saturation
+
+
 def main():
 
-    # add path to pdf to be extracted
+    ## add path to pdf to be extracted
     # pdf_path = ''
     # extract_pdf(pdf_path)
+
+    # arr = []
+
+    dir = 'text'
+    for filename in os.listdir(dir):
+        img_path = os.path.join(dir, filename)
+
+        sat = image_saturation(img_path)
+        # arr.append(sat)
+
+    # for i in arr:
+    #     print(i)
 
 
 if __name__ == "__main__":
