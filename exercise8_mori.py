@@ -24,6 +24,28 @@ def image_saturation(img_path):
     return saturation
 
 
+def contain_color(img_path):
+    img = cv.imread(img_path)
+    hsv = cv.cvtColor(img, cv.COLOR_BGR2HSV)
+
+    lower_blue = np.array([90, 50, 50])
+    upper_blue = np.array([130, 255, 255])
+
+    lower_red = np.array([0, 50, 50])
+    upper_red = np.array([20, 255, 255])
+
+    blue_mask = cv.inRange(hsv, lower_blue, upper_blue)
+    red_mask = cv.inRange(hsv, lower_red, upper_red)
+
+    blue_pixels_present = cv.countNonZero(blue_mask)
+    red_pixels_present = cv.countNonZero(red_mask)
+
+    if blue_pixels_present > 0 or red_pixels_present > 0:
+        return True # diagram
+    else:
+        return False # NOT diagram
+
+
 def classify_by_saturation(saturation):
     if saturation <= 4:
         print(False) # NOT image
@@ -39,13 +61,14 @@ def main():
 
     # arr = []
 
-    dir = 'image'
+    dir = 'dia'
     for filename in os.listdir(dir):
         img_path = os.path.join(dir, filename)
 
-        sat = image_saturation(img_path)
-        classify_by_saturation(sat)
+        # sat = image_saturation(img_path)
+        # classify_by_saturation(sat)
 
+        contains = contain_color(img_path)
 
     # for i in arr:
     #     print(i)
