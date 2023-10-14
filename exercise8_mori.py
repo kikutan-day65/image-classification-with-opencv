@@ -1,18 +1,15 @@
 import cv2 as cv
 import numpy as np
 import os
-from pdf2image import convert_from_path
-
+import fitz
 
 def extract_pdf(pdf_path):
-    pdf = convert_from_path(pdf_path)
+    pdf = fitz.open(pdf_path)
 
-    if pdf is None:
-        print('you might add wrong path')
-
-    for i in range(len(pdf)):
-        pdf[i].save('test/page_' + str(i + 1) + '.jpg', 'JPEG')
-    print('Extracted successfully!')
+    for page_num in range(pdf.page_count):
+        page = pdf.load_page(page_num)    
+        image = page.get_pixmap()
+        image.save(f"test/20-{page_num + 1}.jpg") # change the output path later
 
 
 def image_saturation(img_path):
