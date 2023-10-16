@@ -3,6 +3,7 @@ import numpy as np
 import os
 import fitz
 
+
 def extract_pdf(pdf_path):
     pdf = fitz.open(pdf_path)
 
@@ -43,6 +44,47 @@ def contain_color(img_path):
         return False # NOT diagram
 
 
+def hough_line_p(img_path, filename):
+    img = cv.imread(img_path, cv.IMREAD_GRAYSCALE)
+
+    if img is None:
+        print ('Error opening image!')
+        return -1
+    
+    edges = cv.Canny(img, 200, 400, None, 3)
+    # cv.imwrite(f'canny/{filename}', edges)
+
+    c_edges = cv.cvtColor(edges, cv.COLOR_GRAY2BGR)
+
+    # returns (x0, y0, x1, y1)
+    linesP = cv.HoughLinesP(edges, 1, np.pi / 180, 100, None, 100, 10)
+
+    grad = gradient_of_line(linesP)
+
+ 
+    # if linesP is not None:
+    #     for i in range(0, len(linesP)):
+    #         l = linesP[i][0]
+    #         cv.line(c_edges, (l[0], l[1]), (l[2], l[3]), (0,0,255), 3, cv.LINE_AA)
+        
+    # cv.imwrite(f'canny/{filename}', c_edges)
+
+
+def gradient_of_line(coordinates):
+
+    # get x0 and y0 coordinates
+    x0, y0 = coordinates[:, :, 0], coordinates[:, :, 1]
+
+    # get x1 and y1 coordinates
+    x1, y1 = coordinates[:, :, 2], coordinates[:, :, 3]
+
+    # gradient calculation
+    grad = (y1 - y0) // (x1 - x0)
+
+    print(grad)
+
+
+
 def classify(img_path, filename, saturation, contains):
     img = cv.imread(img_path)
 
@@ -63,16 +105,22 @@ def main():
     # pdf_path = 'pdfs_image_classification_task/pdfs/20.pdf'
     # extract_pdf(pdf_path)
 
+    # img_path = 'dia/test-248.jpg'
+    img_path = 'text/test-198.jpg'
+
+    hough_line_p(img_path, filename='example')
+
     # arr = []
 
-    dir = 'test'
-    for filename in os.listdir(dir):
-        img_path = os.path.join(dir, filename)
+    # dir = 'dia'
+    # for filename in os.listdir(dir):
+    #     img_path = os.path.join(dir, filename)
 
-        sat = image_saturation(img_path)
-        contains = contain_color(img_path)
+        # sat = image_saturation(img_path)
+        # contains = contain_color(img_path)
+        # hough_line_p(img_path, filename)
 
-        classify(img_path, filename, sat, contains)
+        # classify(img_path, filename, sat, contains)
 
     # for i in arr:
     #     print(i)
