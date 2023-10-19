@@ -4,13 +4,34 @@ import os
 import fitz
 
 
-def extract_pdf(pdf_path):
+def extract_pdf(pdf_path, i):
     pdf = fitz.open(pdf_path)
 
     for page_num in range(pdf.page_count):
         page = pdf.load_page(page_num)    
         image = page.get_pixmap()
-        image.save(f"test/20-{page_num + 1}.jpg") # change the output path later
+        image.save(f"test{i}/{page_num + 1}.jpg") # change the output path later
+
+
+def create_dir(i):
+
+    result_arr = ['diagram', 'text', 'image']
+    parent_dir = './'
+
+    # create each result directory
+    for dir_name in result_arr:
+        result_dia = f'result/{i}/{dir_name}'
+        result_path = os.path.join(parent_dir, result_dia)
+        
+        if not os.path.exists(result_path):
+            os.makedirs(result_path)
+
+    # create each resource directory
+    resource_dir = f'resource/{i}'
+    resource_path = os.path.join(parent_dir, resource_dir)
+
+    if not os.path.exists(resource_path):
+        os.makedirs(resource_path)
 
 
 def image_saturation(img_path):
