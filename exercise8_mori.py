@@ -65,7 +65,7 @@ def contain_color(img_path):
         return False # NOT diagram
 
 
-def hough_line_p(img_path, filename):
+def get_coordinates(img_path):
     img = cv.imread(img_path, cv.IMREAD_GRAYSCALE)
 
     if img is None:
@@ -78,26 +78,12 @@ def hough_line_p(img_path, filename):
     c_edges = cv.cvtColor(edges, cv.COLOR_GRAY2BGR)
 
     # returns (x0, y0, x1, y1)
+    coordinates = cv.HoughLinesP(edges, 1, np.pi / 180, 250, None, 60, 5) # 250  60 5 might be best
 
-    linesP = cv.HoughLinesP(edges, 1, np.pi / 180, 250, None, 60, 5)
-
-    grad = gradient_of_line(linesP)
-
-    # print(grad)
-
-    lines = np.count_nonzero(grad)
-
-    return lines
-
-    # if linesP is not None:
-    #     for i in range(0, len(linesP)):
-    #         l = linesP[i][0]
-    #         cv.line(c_edges, (l[0], l[1]), (l[2], l[3]), (0,0,255), 3, cv.LINE_AA)
-        
-    # cv.imwrite(f'lines/{filename}', c_edges)
+    return coordinates
 
 
-def gradient_of_line(coordinates):
+def get_gradient(coordinates):
 
     # get x0 and y0 coordinates
     x0, y0 = coordinates[:, :, 0], coordinates[:, :, 1]
@@ -115,21 +101,27 @@ def gradient_of_line(coordinates):
     return gradient
 
 
-def classify(img_path, filename, saturation, contains, lines, dir_num):
+def count_tilted_lines(gradients):
+    lines = np.count_nonzero(gradients)
+
+    return lines
+
+
+def classify(img_path, filename, saturation, contains, lines):
     img = cv.imread(img_path)
 
     if saturation > 2:
-        cv.imwrite(f'result/{dir_num}/image/{filename}', img)
+        cv.imwrite(f'result-all/image/{filename}', img)
         return 0
     
     if contains is True:
-        cv.imwrite(f'result/{dir_num}/diagram/{filename}', img)
+        cv.imwrite(f'result-all/diagram/{filename}', img)
     else:
 
         if lines < 3:
-            cv.imwrite(f'result/{dir_num}/text/{filename}', img)
+            cv.imwrite(f'result-all/text/{filename}', img)
         else:
-            cv.imwrite(f'result/{dir_num}/diagram/{filename}', img)
+            cv.imwrite(f'result-all/diagram/{filename}', img)
 
 
 # 線の長さを検出してみる(maxとminを両方使ってやってみる)
@@ -138,25 +130,37 @@ def classify(img_path, filename, saturation, contains, lines, dir_num):
 
 def main():
 
-    # add path to pdf to be extracted
-    for i in range(1, 23):
-        create_dir(i)
+    # # add path to pdf to be extracted
+    # for i in range(1, 23):
+    #     create_dir(i)
 
-        pdf_path = f'pdfs_image_classification_task/pdfs/{i}.pdf'
-        extract_pdf(pdf_path, i)
-        print(f'{i}.pdf extracted successfully!')
+    #     pdf_path = f'pdfs_image_classification_task/pdfs/{i}.pdf'
+    #     extract_pdf(pdf_path, i)
+    #     print(f'{i}.pdf extracted successfully!')
 
 
-    dir = f'' # directory path to be classified 
+    arr = []
+
+    dir = f'dia2' # directory path to be classified 
     print(dir)
     for filename in os.listdir(dir):
         img_path = os.path.join(dir, filename)
 
-        sat = image_saturation(img_path)
-        contains = contain_color(img_path)
-        lines = hough_line_p(img_path, filename)
+        # sat = image_saturation(img_path)
+        # contains = contain_color(img_path)
+
+        coordinates = get_coordinates(img_path)
+        gradients = get_gradient(coordinates)
+        lines = count_tilted_lines(gradients)
+
+        arr.append(lines)
         
-        classify(img_path, filename, sat, contains, lines)
+        # classify(img_path, filename, sat, contains, lines)
+
+    arr.sort()
+    for i in arr:
+        print(i, end=' ')
+    print()
 
 
 if __name__ == "__main__":
