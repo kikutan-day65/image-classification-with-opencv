@@ -10,7 +10,7 @@ def extract_pdf(pdf_path, i):
     for page_num in range(pdf.page_count):
         page = pdf.load_page(page_num)    
         image = page.get_pixmap()
-        image.save(f"test{i}/{page_num + 1}.jpg") # change the output path later
+        image.save(f"resource/{i}/{page_num + 1}.jpg") # change the output path later
 
 
 def create_dir(i):
@@ -59,7 +59,7 @@ def contain_color(img_path):
     blue_pixels_present = cv.countNonZero(blue_mask)
     red_pixels_present = cv.countNonZero(red_mask)
 
-    if blue_pixels_present > 0 or red_pixels_present > 0:
+    if blue_pixels_present > 90 or red_pixels_present > 90:
         return True # diagram
     else:
         return False # NOT diagram
@@ -72,23 +72,29 @@ def hough_line_p(img_path, filename):
         print ('Error opening image!')
         return -1
     
-    edges = cv.Canny(img, 200, 400, None, 3)
+    edges = cv.Canny(img, 50, 150)
     # cv.imwrite(f'canny/{filename}', edges)
 
     c_edges = cv.cvtColor(edges, cv.COLOR_GRAY2BGR)
 
     # returns (x0, y0, x1, y1)
-    linesP = cv.HoughLinesP(edges, 1, np.pi / 180, 100, None, 100, 10)
+
+    linesP = cv.HoughLinesP(edges, 1, np.pi / 180, 250, None, 60, 5)
 
     grad = gradient_of_line(linesP)
 
- 
+    # print(grad)
+
+    lines = np.count_nonzero(grad)
+
+    return lines
+
     # if linesP is not None:
     #     for i in range(0, len(linesP)):
     #         l = linesP[i][0]
     #         cv.line(c_edges, (l[0], l[1]), (l[2], l[3]), (0,0,255), 3, cv.LINE_AA)
         
-    # cv.imwrite(f'canny/{filename}', c_edges)
+    # cv.imwrite(f'lines/{filename}', c_edges)
 
 
 def gradient_of_line(coordinates):
@@ -99,52 +105,58 @@ def gradient_of_line(coordinates):
     # get x1 and y1 coordinates
     x1, y1 = coordinates[:, :, 2], coordinates[:, :, 3]
 
-    # gradient calculation
-    grad = (y1 - y0) // (x1 - x0)
+    # Check if the denominator (x1 - x0) is zero
+    denominator_zero = (x1 - x0) == 0
 
-    print(grad)
+    # Calculate gradient, but set the value to 0 when denominator is zero
+    gradient = (y1 - y0) // (x1 - x0)
+    gradient[denominator_zero] = 0
+
+    return gradient
 
 
-
-def classify(img_path, filename, saturation, contains):
+def classify(img_path, filename, saturation, contains, lines, dir_num):
     img = cv.imread(img_path)
 
     if saturation > 2:
-        cv.imwrite(f'result/image/{filename}', img)
+        cv.imwrite(f'result/{dir_num}/image/{filename}', img)
         return 0
     
     if contains is True:
-        cv.imwrite(f'result/diagram/{filename}', img)
-        return 0
-    
-    cv.imwrite(f'result/text/{filename}', img)
+        cv.imwrite(f'result/{dir_num}/diagram/{filename}', img)
+    else:
+
+        if lines < 3:
+            cv.imwrite(f'result/{dir_num}/text/{filename}', img)
+        else:
+            cv.imwrite(f'result/{dir_num}/diagram/{filename}', img)
+
+
+# 線の長さを検出してみる(maxとminを両方使ってやってみる)
+# xとyの座標の位置がどの象限に入るかにやってみる
 
 
 def main():
 
     # add path to pdf to be extracted
-    # pdf_path = 'pdfs_image_classification_task/pdfs/20.pdf'
-    # extract_pdf(pdf_path)
+    for i in range(1, 23):
+        create_dir(i)
 
-    # img_path = 'dia/test-248.jpg'
-    img_path = 'text/test-198.jpg'
+        pdf_path = f'pdfs_image_classification_task/pdfs/{i}.pdf'
+        extract_pdf(pdf_path, i)
+        print(f'{i}.pdf extracted successfully!')
 
-    hough_line_p(img_path, filename='example')
 
-    # arr = []
+    dir = f'' # directory path to be classified 
+    print(dir)
+    for filename in os.listdir(dir):
+        img_path = os.path.join(dir, filename)
 
-    # dir = 'dia'
-    # for filename in os.listdir(dir):
-    #     img_path = os.path.join(dir, filename)
-
-        # sat = image_saturation(img_path)
-        # contains = contain_color(img_path)
-        # hough_line_p(img_path, filename)
-
-        # classify(img_path, filename, sat, contains)
-
-    # for i in arr:
-    #     print(i)
+        sat = image_saturation(img_path)
+        contains = contain_color(img_path)
+        lines = hough_line_p(img_path, filename)
+        
+        classify(img_path, filename, sat, contains, lines)
 
 
 if __name__ == "__main__":
