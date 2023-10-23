@@ -101,7 +101,7 @@ def process_contour(img, img_path, contour, filename):
 
     im = Image.open(img_path)
     im_crop = im.crop((x, y, x2, y2))
-    im_crop.save(f'result/cut-out-image/extracted_{filename}', quality=95)
+    im_crop.save(f'cutout-image/extracted_{filename}', quality=95)
 
 
 def cut_out_pic(img_path, filename):
