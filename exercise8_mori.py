@@ -74,12 +74,9 @@ def get_coordinates(img_path):
         return -1
     
     edges = cv.Canny(img, 50, 150)
-    # cv.imwrite(f'canny/{filename}', edges)
-
-    c_edges = cv.cvtColor(edges, cv.COLOR_GRAY2BGR)
-
+    
     # returns (x0, y0, x1, y1)
-    coordinates = cv.HoughLinesP(edges, 1, np.pi / 180, 250, None, 60, 5) # 250  60 5 might be best
+    coordinates = cv.HoughLinesP(edges, 1, np.pi / 180, 250, None, 60, 5)
 
     return coordinates
 
@@ -106,25 +103,6 @@ def count_tilted_lines(gradients):
     lines = np.count_nonzero(gradients)
 
     return lines
-
-
-# def distance_of_points(coordinates):
-#     print(coordinates)
-#     print()
-
-#     # get x0 and y0 coordinates
-#     x0, y0 = coordinates[:, :, 0], coordinates[:, :, 1]
-
-#     # get x1 and y1 coordinates
-#     x1, y1 = coordinates[:, :, 2], coordinates[:, :, 3]
-
-#     # distance of two points
-#     distance = math.sqrt(((x1 - x0) ** 2) + ((y1 - y0) ** 2))
-#     # print(distance)
-#     # print()
-
-#     return distance
-
 
 
 def classify(img_path, filename, saturation, contains, lines):
@@ -154,9 +132,6 @@ def main():
     #     extract_pdf(pdf_path, i)
     #     print(f'{i}.pdf extracted successfully!')
 
-
-    # arr = []
-
     dir = f'test-all' # directory path to be classified 
     print(dir)
     for filename in os.listdir(dir):
@@ -168,16 +143,8 @@ def main():
         coordinates = get_coordinates(img_path)
         gradients = get_gradient(coordinates)
         lines = count_tilted_lines(gradients)
-        # distance = distance_of_points(coordinates)
-
-        # arr.append(lines)
         
         classify(img_path, filename, sat, contains, lines)
-
-    # arr.sort()
-    # for i in arr:
-    #     print(i, end=' ')
-    # print()
 
 
 if __name__ == "__main__":
