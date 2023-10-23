@@ -13,7 +13,7 @@ def extract_pdf(pdf_path, filename):
 
 def create_dir():
 
-    dir_names = ['diagram', 'text', 'image']
+    dir_names = ['diagram', 'text', 'image', 'cutout-image']
     parent_dir = './'
 
     # create result directory

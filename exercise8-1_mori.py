@@ -1,6 +1,7 @@
 import cv2 as cv
 import numpy as np
 import os
+from PIL import Image
 
 
 def image_saturation(img_path):
@@ -90,6 +91,37 @@ def classify(img_path, filename, saturation, contains, lines):
             cv.imwrite(f'result/diagram/{filename}', img)
 
 
+def process_contour(img, img_path, contour, filename):
+    peri = cv.arcLength(contour, True)
+    approx = cv.approxPolyDP(contour, 0.01 * peri, True)
+    x, y, w, h = cv.boundingRect(contour)
+    x2, y2 = x + w, y + h
+
+    cv.rectangle(img, (x, y), (x2, y2), (0, 0, 255), 2)
+
+    im = Image.open(img_path)
+    im_crop = im.crop((x, y, x2, y2))
+    im_crop.save(f'result/cut-out-image/extracted_{filename}', quality=95)
+
+
+def cut_out_pic(img_path, filename):
+    img = cv.imread(img_path)
+
+    upper = np.array([250, 255, 250])
+    lower = np.array([0, 10, 5])
+
+    hsv = cv.cvtColor(img, cv.COLOR_BGR2HSV)
+    mask = cv.inRange(hsv, lower, upper)
+
+    contours, hierarchy = cv.findContours(mask.copy(), cv.RETR_EXTERNAL, cv.CHAIN_APPROX_SIMPLE)
+    c = max(contours, key=cv.contourArea)
+    c_sort = sorted(contours, key=cv.contourArea)
+    c2 = c_sort[-2]
+
+    process_contour(img, img_path, c, filename)
+    process_contour(img, img_path, c2, filename)
+
+
 def main():
     dir = f'resource'
     for filename in os.listdir(dir):
@@ -103,6 +135,13 @@ def main():
         lines = count_tilted_lines(gradients)
         
         classify(img_path, filename, sat, contains, lines)
+
+
+    dir = 'result/image'
+    for filename in os.listdir(dir):
+        img_path = os.path.join(dir, filename)
+
+        cut_out_pic(img_path, filename)
 
 
 if __name__ == "__main__":
