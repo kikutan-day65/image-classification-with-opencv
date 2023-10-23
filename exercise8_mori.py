@@ -2,6 +2,7 @@ import cv2 as cv
 import numpy as np
 import os
 import fitz
+import math
 
 
 def extract_pdf(pdf_path, i):
@@ -107,6 +108,25 @@ def count_tilted_lines(gradients):
     return lines
 
 
+# def distance_of_points(coordinates):
+#     print(coordinates)
+#     print()
+
+#     # get x0 and y0 coordinates
+#     x0, y0 = coordinates[:, :, 0], coordinates[:, :, 1]
+
+#     # get x1 and y1 coordinates
+#     x1, y1 = coordinates[:, :, 2], coordinates[:, :, 3]
+
+#     # distance of two points
+#     distance = math.sqrt(((x1 - x0) ** 2) + ((y1 - y0) ** 2))
+#     # print(distance)
+#     # print()
+
+#     return distance
+
+
+
 def classify(img_path, filename, saturation, contains, lines):
     img = cv.imread(img_path)
 
@@ -124,10 +144,6 @@ def classify(img_path, filename, saturation, contains, lines):
             cv.imwrite(f'result-all/diagram/{filename}', img)
 
 
-# 線の長さを検出してみる(maxとminを両方使ってやってみる)
-# xとyの座標の位置がどの象限に入るかにやってみる
-
-
 def main():
 
     # # add path to pdf to be extracted
@@ -139,28 +155,29 @@ def main():
     #     print(f'{i}.pdf extracted successfully!')
 
 
-    arr = []
+    # arr = []
 
-    dir = f'dia2' # directory path to be classified 
+    dir = f'test-all' # directory path to be classified 
     print(dir)
     for filename in os.listdir(dir):
         img_path = os.path.join(dir, filename)
 
-        # sat = image_saturation(img_path)
-        # contains = contain_color(img_path)
+        sat = image_saturation(img_path)
+        contains = contain_color(img_path)
 
         coordinates = get_coordinates(img_path)
         gradients = get_gradient(coordinates)
         lines = count_tilted_lines(gradients)
+        # distance = distance_of_points(coordinates)
 
-        arr.append(lines)
+        # arr.append(lines)
         
-        # classify(img_path, filename, sat, contains, lines)
+        classify(img_path, filename, sat, contains, lines)
 
-    arr.sort()
-    for i in arr:
-        print(i, end=' ')
-    print()
+    # arr.sort()
+    # for i in arr:
+    #     print(i, end=' ')
+    # print()
 
 
 if __name__ == "__main__":
