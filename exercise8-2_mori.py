@@ -13,7 +13,7 @@ def extract_pdf(pdf_path, filename):
 
 def create_dir():
 
-    dir_names = ['diagram', 'text', 'image', 'cutout-image']
+    dir_names = ['diagram', 'text', 'image']
     parent_dir = './'
 
     # create result directory
@@ -25,6 +25,14 @@ def create_dir():
             os.makedirs(result_path)
         else:
             print(f'{result_path} already exist!')
+
+    cutout_dir = 'cutout-image'
+    cutout_path = os.path.join(parent_dir, cutout_dir)
+
+    if not os.path.exists(cutout_path):
+        os.makedirs(cutout_path)
+    else:
+        print(f'{cutout_path} already exist!')
 
     # create each resource directory
     resource_dir = f'resource'
