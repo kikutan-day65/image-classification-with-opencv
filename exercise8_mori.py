@@ -2,7 +2,6 @@ import cv2 as cv
 import numpy as np
 import os
 import fitz
-import math
 
 
 def extract_pdf(pdf_path, i):
@@ -74,7 +73,7 @@ def get_coordinates(img_path):
         return -1
     
     edges = cv.Canny(img, 50, 150)
-    
+
     # returns (x0, y0, x1, y1)
     coordinates = cv.HoughLinesP(edges, 1, np.pi / 180, 250, None, 60, 5)
 
