@@ -74,23 +74,6 @@ def count_tilted_lines(gradients):
     return lines
 
 
-def classify(img_path, filename, saturation, contains, lines):
-    img = cv.imread(img_path)
-
-    if saturation > 2:
-        cv.imwrite(f'result/image/{filename}', img)
-        return 0
-    
-    if contains is True:
-        cv.imwrite(f'result/diagram/{filename}', img)
-    else:
-
-        if lines < 3:
-            cv.imwrite(f'result/text/{filename}', img)
-        else:
-            cv.imwrite(f'result/diagram/{filename}', img)
-
-
 def cutout_pic(img_path, filename):
     img = cv.imread(img_path)
 
@@ -127,31 +110,44 @@ def cutout_pic(img_path, filename):
     img = cv.imread(img_path)
 
     img_crop = img[y: y_2, x: x_2]
-    cv.imwrite(f'cutout-image/{filename}', img_crop)
+    cv.imwrite(f'cutout-image/extracted_{img_path[9:26]}-{filename}', img_crop)
 
     img_crop = img[y2: y2_2, x2: x2_2]
-    cv.imwrite(f'cutout-image/{filename}', img_crop)
+    cv.imwrite(f'cutout-image/extracted_{img_path[9:26]}-{filename}', img_crop)
+
+
+def classify(img_path, filename, saturation, contains, lines):
+    img = cv.imread(img_path)
+
+    if saturation > 2:
+        cv.imwrite(f'result/{img_path[9:26]}/image/{filename}', img)
+        cutout_pic(img_path, filename)
+        return 0
+    
+    if contains is True:
+        cv.imwrite(f'result/{img_path[9:26]}/diagram/{filename}', img)
+    else:
+
+        if lines < 3:
+            cv.imwrite(f'result/{img_path[9:26]}/text/{filename}', img)
+        else:
+            cv.imwrite(f'result/{img_path[9:26]}/diagram/{filename}', img)
 
 
 def main():
-    # dir = f'resource'
-    # for filename in os.listdir(dir):
-    #     img_path = os.path.join(dir, filename)
-
-    #     sat = image_saturation(img_path)
-    #     contains = contain_color(img_path)
-
-    #     coordinates = get_coordinates(img_path)
-    #     gradients = get_gradient(coordinates)
-    #     lines = count_tilted_lines(gradients)
+    resource_dir = f'resource'
+    for dir, subdirs, filenames in os.walk(resource_dir):
+        for filename in filenames:
+            img_path = os.path.join(dir, filename)
         
-    #     classify(img_path, filename, sat, contains, lines)
+            sat = image_saturation(img_path)
+            contains = contain_color(img_path)
 
-    dir = 'result/image'
-    for filename in os.listdir(dir):
-        img_path = os.path.join(dir, filename)
-
-        cutout_pic(img_path, filename)
+            coordinates = get_coordinates(img_path)
+            gradients = get_gradient(coordinates)
+            lines = count_tilted_lines(gradients)
+            
+            classify(img_path, filename, sat, contains, lines)
 
 
 if __name__ == "__main__":
