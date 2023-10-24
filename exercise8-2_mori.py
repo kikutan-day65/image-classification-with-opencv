@@ -11,49 +11,45 @@ def extract_pdf(pdf_path, filename):
         image.save(f"resource/{filename[:-4]}-{page_num + 1}.jpg")
 
 
-def create_dir():
+def create_dir(filename):
 
     dir_names = ['diagram', 'text', 'image']
-    parent_dir = './'
+    parent_dir = './result'
 
-    # create result directory
+    # create each result directory
     for dir_name in dir_names:
-        result_dia = f'result/{dir_name}'
-        result_path = os.path.join(parent_dir, result_dia)
+        result_dir = f'{filename[:-4]}/{dir_name}'
+        result_path = os.path.join(parent_dir, result_dir)
         
         if not os.path.exists(result_path):
             os.makedirs(result_path)
-        else:
-            print(f'{result_path} already exist!')
 
+    # create directory for cutout images
     cutout_dir = 'cutout-image'
     cutout_path = os.path.join(parent_dir, cutout_dir)
 
     if not os.path.exists(cutout_path):
         os.makedirs(cutout_path)
-    else:
-        print(f'{cutout_path} already exist!')
 
     # create each resource directory
-    resource_dir = f'resource'
+    parent_dir = f'resource'
+    resource_dir = f'{filename[:-4]}'
     resource_path = os.path.join(parent_dir, resource_dir)
 
     if not os.path.exists(resource_path):
         os.makedirs(resource_path)
-    else:
-        print(f'{resource_path} already exist!')
 
 
 def main():
 
-    create_dir()
-
     dir = 'pdfs_image_classification_task/pdfs'
     for filename in os.listdir(dir):
         pdf_path = os.path.join(dir, filename)
+
+        create_dir(filename)
         
-        extract_pdf(pdf_path, filename)
-        print(f'{filename} extracted successfully!')
+        # extract_pdf(pdf_path, filename)
+        # print(f'{filename} extracted successfully!')
 
 
 if __name__ == "__main__":
