@@ -29,6 +29,7 @@ def create_dir(filename):
             os.makedirs(result_path)
 
     # create directory for cutout images
+    parent_dir = './'
     cutout_dir = 'cutout-image'
     cutout_path = os.path.join(parent_dir, cutout_dir)
 
