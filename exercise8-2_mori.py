@@ -8,7 +8,11 @@ def extract_pdf(pdf_path, filename):
     for page_num in range(pdf.page_count):
         page = pdf.load_page(page_num)    
         image = page.get_pixmap()
-        image.save(f"resource/{filename[:-4]}-{page_num + 1}.jpg")
+
+        if os.path.exists(f'resource/{filename[:-4]}'):
+            image.save(f"resource/{filename[:-4]}/{page_num + 1}.jpg")
+        else:
+            print("directory does't exist")
 
 
 def create_dir(filename):
@@ -48,8 +52,8 @@ def main():
 
         create_dir(filename)
         
-        # extract_pdf(pdf_path, filename)
-        # print(f'{filename} extracted successfully!')
+        extract_pdf(pdf_path, filename)
+        print(f'{filename} page extracted successfully!')
 
 
 if __name__ == "__main__":
