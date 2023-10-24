@@ -91,57 +91,67 @@ def classify(img_path, filename, saturation, contains, lines):
             cv.imwrite(f'result/diagram/{filename}', img)
 
 
-def process_contour(img, img_path, contour, filename):
-    peri = cv.arcLength(contour, True)
-    approx = cv.approxPolyDP(contour, 0.01 * peri, True)
-    x, y, w, h = cv.boundingRect(contour)
-    x2, y2 = x + w, y + h
-
-    cv.rectangle(img, (x, y), (x2, y2), (0, 0, 255), 2)
-
-    im = Image.open(img_path)
-    im_crop = im.crop((x, y, x2, y2))
-    im_crop.save(f'cutout-image/extracted_{filename}', quality=95)
-
-
-def cut_out_pic(img_path, filename):
+def cutout_pic(img_path, filename):
     img = cv.imread(img_path)
+
+    hsv = cv.cvtColor(img, cv.COLOR_BGR2HSV) 
 
     upper = np.array([250, 255, 250])
     lower = np.array([0, 10, 5])
-
-    hsv = cv.cvtColor(img, cv.COLOR_BGR2HSV)
     mask = cv.inRange(hsv, lower, upper)
 
-    contours, hierarchy = cv.findContours(mask.copy(), cv.RETR_EXTERNAL, cv.CHAIN_APPROX_SIMPLE)
-    c = max(contours, key=cv.contourArea)
+    contours, hierarcies = cv.findContours(mask.copy(), cv.RETR_EXTERNAL, cv.CHAIN_APPROX_SIMPLE)
+    c = max(contours, key=cv.contourArea) 
     c_sort = sorted(contours, key=cv.contourArea)
     c2 = c_sort[-2]
 
-    process_contour(img, img_path, c, filename)
-    process_contour(img, img_path, c2, filename)
+    peri = cv.arcLength(c2, True)
+    approx = cv.approxPolyDP(c2, 0.01 * peri, True)
+
+    epsilon = 0.05*cv.arcLength(c,True)
+    approx = cv.approxPolyDP(c, epsilon, True)
+
+    epsilon2 = 0.05*cv.arcLength(c2, True)
+    approx2 = cv.approxPolyDP(c2, epsilon2, True)
+
+    x, y, w, h = cv.boundingRect(c)
+    x_2 = x + w
+    y_2 = y + h
+    img = cv.rectangle(img, (x, y), (x_2, y_2), (0, 0, 255), 2)
+
+    x2, y2, w2, h2 = cv.boundingRect(c2)
+    x2_2 = x2 + w2
+    y2_2 = y2 + h2
+    img = cv.rectangle(img, (x2, y2),(x2_2, y2_2), (0, 0, 255), 2)
+
+    img = cv.imread(img_path)
+
+    img_crop = img[y: y_2, x: x_2]
+    cv.imwrite(f'cutout-image/{filename}', img_crop)
+
+    img_crop = img[y2: y2_2, x2: x2_2]
+    cv.imwrite(f'cutout-image/{filename}', img_crop)
 
 
 def main():
-    dir = f'resource'
-    for filename in os.listdir(dir):
-        img_path = os.path.join(dir, filename)
+    # dir = f'resource'
+    # for filename in os.listdir(dir):
+    #     img_path = os.path.join(dir, filename)
 
-        sat = image_saturation(img_path)
-        contains = contain_color(img_path)
+    #     sat = image_saturation(img_path)
+    #     contains = contain_color(img_path)
 
-        coordinates = get_coordinates(img_path)
-        gradients = get_gradient(coordinates)
-        lines = count_tilted_lines(gradients)
+    #     coordinates = get_coordinates(img_path)
+    #     gradients = get_gradient(coordinates)
+    #     lines = count_tilted_lines(gradients)
         
-        classify(img_path, filename, sat, contains, lines)
-
+    #     classify(img_path, filename, sat, contains, lines)
 
     dir = 'result/image'
     for filename in os.listdir(dir):
         img_path = os.path.join(dir, filename)
 
-        cut_out_pic(img_path, filename)
+        cutout_pic(img_path, filename)
 
 
 if __name__ == "__main__":
